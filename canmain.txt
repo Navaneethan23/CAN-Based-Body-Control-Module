@@ -1,0 +1,101 @@
+#include<lpc21xx.h>
+#include "can2_driver.c"
+#include "header.h"
+#include "uart0_driver.c"
+#include "canlcd.c"
+
+#define sw1 14
+#define sw2 15
+#define sw3 16
+
+int main(){	
+
+	CAN2_MSG m1, m2, m3;
+
+	IODIR0 = sw1|sw2|sw3;
+	LCD_init();
+
+	can2_init();
+
+	/*sending data frame*/
+
+	m1.id=0x000001AF;
+
+	m1.rtr=0;//data frame
+
+	m1.dlc=4;
+
+	m1.byteA=0xDDCCBBAA;
+
+	m1.byteB=0;
+
+	
+
+	m2.id=0x000001BF;
+
+	m2.rtr=0;//data frame
+
+	m2.dlc=4;
+
+	m2.byteA=0xDDCCBBAA;
+
+	m2.byteB=0;
+	
+	
+
+	m3.id=0x000001CF;
+
+	m3.rtr=0;//data frame
+
+	m3.dlc=4;
+
+	m3.byteA=0xDDCCBBAA;
+
+	m3.byteB=0;
+  str (" transfering");
+
+	while(1)
+		{
+			
+		if((IOPIN0>> sw1 &1)== 0){
+				  LCD_command(0x01);
+				   LCD_command(0x80);
+	     str("LEFTINDICATORON");
+		 	
+
+		can2_tx(m1);//data-frame
+
+	
+		delay_milli(200);
+
+
+		}
+		
+		if((IOPIN0>> sw2 &1)== 0){
+					 LCD_command(0x01);
+					  LCD_command(0x80);
+		str("RIGHTINDICATORON");
+
+		can2_tx(m2);//data-frame
+
+		delay_milli(200);
+
+		
+
+		}
+		if((IOPIN0>> sw3 &1)== 0){
+		 LCD_command(0x01);
+		 LCD_command(0x80);
+
+   		str("WIPER ON");	
+
+		can2_tx(m3);//data-frame
+		delay_milli(200);
+		
+
+		}
+		}
+   
+}
+
+
