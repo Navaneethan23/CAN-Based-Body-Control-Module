@@ -7,7 +7,9 @@
 #define sw1 14
 #define sw2 15
 #define sw3 16
-
+  int flag1=0;
+  int flag2 =0;
+  int flag3 =0;
 int main(){	
 
 	CAN2_MSG m1, m2, m3;
@@ -16,6 +18,8 @@ int main(){
 	LCD_init();
 
 	can2_init();
+
+	uart0_init( 115200);
 
 	/*sending data frame*/
 
@@ -52,47 +56,97 @@ int main(){
 	m3.byteA=0xDDCCBBAA;
 
 	m3.byteB=0;
-  str (" transfering");
+    str (" transfering");
+    uart0_tx_string("TRANSFERING\r\n");
 
 	while(1)
 		{
-			
+			 
 		if((IOPIN0>> sw1 &1)== 0){
+
+		uart0_tx_string("MESSAGE ID:");
+		uart0_tx_hex( 0x000001AF);
+		uart0_tx_string("\r\n");
+		  if(flag1 == 0){
+		  flag1 =1;
 				  LCD_command(0x01);
 				   LCD_command(0x80);
 	     str("LEFTINDICATORON");
+		 uart0_tx_string("LEFT INDICATOR ON\r\n");
 		 	
-
 		can2_tx(m1);//data-frame
 
-	
 		delay_milli(200);
 
 
-		}
+		}  else{
+		        flag1 =0;
+		       	 LCD_command(0x01);
+				   LCD_command(0x80);
+		 str("LEFTINDICATOROFF");
+		 uart0_tx_string("LEFT INDICATOR OFF\r\n");
+		      
+		    
+			can2_tx(m1);//data-frame
+
+			delay_milli(200);
+		 }
+		} 
 		
-		if((IOPIN0>> sw2 &1)== 0){
-					 LCD_command(0x01);
-					  LCD_command(0x80);
-		str("RIGHTINDICATORON");
+	  else if((IOPIN0>> sw2 &1)== 0){
 
-		can2_tx(m2);//data-frame
+		uart0_tx_string("MESSAGE ID:");
+		uart0_tx_hex( 0x000001BF);
+		uart0_tx_string("\r\n");
 
-		delay_milli(200);
-
+		if(flag2 == 0){
 		
-
-		}
-		if((IOPIN0>> sw3 &1)== 0){
+		  					flag2 =1;
 		 LCD_command(0x01);
 		 LCD_command(0x80);
+		str("RIGHTINDICATORON");
+		uart0_tx_string("RIGHT INDICATOR ON\r\n");
+
+		can2_tx(m2);//data-frame
+		delay_milli(200);
+
+		  }else{
+		  					flag2 =0;
+
+				 str("RIGHTINDICATOROFF");
+	        	uart0_tx_string("RIGHT INDICATOR OFF\r\n");
+				
+	        	can2_tx(m2);//data-frame
+				delay_milli(200);
+		  }
+
+		}
+		else if((IOPIN0>> sw3 &1)== 0){
+		uart0_tx_hex( 0x000001CF);
+		uart0_tx_string("\r\n");
+
+		   if(flag3 == 0){
+
+		 flag3 =1;
+		 LCD_command(0x01);
+		 LCD_command(0x83);
 
    		str("WIPER ON");	
-
+		uart0_tx_string("WIPER ON\r\n");
 		can2_tx(m3);//data-frame
 		delay_milli(200);
 		
+		}else{
+				 flag3 = 0;
+				  LCD_command(0x01);
+		 LCD_command(0x83);
+		  str("WIPER OFF");	
 
+		uart0_tx_string("WIPER OFF\r\n");
+
+		can2_tx(m3);//data-frame
+		delay_milli(200);
+		}
 		}
 		}
    
